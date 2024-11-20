@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<title>Your Cart</title>
+<link href="assets/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+	<jsp:include page="header.html" />
+
+	<main class="container py-5">
+		<h1>Your Cart</h1>
+
+		<!-- Hero section if the cart is empty -->
+		<div id="hero-section" class="alert alert-info text-center"
+			style="display: none;">
+			<h3>Your cart is empty</h3>
+			<p>It looks like you haven't added any services to your cart.
+				Please visit our services page to book a service.</p>
+		</div>
+
+		<!-- Cart items table -->
+		<table id="cart-table" class="table table-striped"
+			style="display: none;">
+			<thead>
+				<tr>
+					<th>Service Name</th>
+					<th>Price</th>
+					<th>Actions</th>
+				</tr>
+			</thead>
+			<tbody id="cart-items"></tbody>
+		</table>
+	</main>
+
+	<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Fetch cart items from the server
+    fetch('/JAD-CA1/get-cart')
+        .then(response => response.json())
+        .then(cartItems => {
+            console.log('Cart items response:', cartItems);  // Log the full response to ensure it's correct
+
+            const cartTable = document.getElementById('cart-table');
+            const cartBody = document.getElementById('cart-items');
+            const heroSection = document.getElementById('hero-section');
+
+            // Check if cart is empty
+            if (cartItems && Array.isArray(cartItems.cart) && cartItems.cart.length === 0) {
+                console.log('Cart is empty');
+                heroSection.style.display = 'block';
+                cartTable.style.display = 'none';  // Hide the table
+            } else {
+                console.log('Populating the table with cart items');
+                cartTable.style.display = 'table';
+                cartItems.cart.forEach(item => {
+                    console.log('Item:', item);  // Log each item to check if price exists
+
+                    const row = document.createElement('tr');
+
+                    // Create cells for each piece of data
+                    const nameCell = document.createElement('td');
+                    nameCell.textContent = item.name || 'Unknown';  // Display name or 'Unknown' if not available
+
+                    // Log to ensure price is present
+                    console.log('Price:', item.price);  
+
+                    const priceCell = document.createElement('td');
+                    if (item.price) {
+                        priceCell.textContent = "$"+ item.price;  // Display price if available
+                    } else {
+                        priceCell.textContent = 'N/A';  // Fallback if no price is available
+                    }
+
+                    const actionsCell = document.createElement('td');
+                    const removeButton = document.createElement('button');
+                    removeButton.textContent = 'Remove';
+                    removeButton.className = 'btn btn-danger btn-sm';
+                    removeButton.addEventListener('click', () => {
+                        removeCartItem(item.name);  // Function to remove the item from the cart
+                    });
+
+                    actionsCell.appendChild(removeButton);
+
+                    // Append cells to the row
+                    row.appendChild(nameCell);
+                    row.appendChild(priceCell);
+                    row.appendChild(actionsCell);
+
+                    // Append row to the table body
+                    cartBody.appendChild(row);
+
+                    // Log to confirm the row is appended
+                    console.log('Row appended:', row);
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching cart:', error);
+        });
+});
+
+// Function to remove a cart item
+function removeCartItem(serviceName) {
+    fetch('/JAD-CA1/remove-from-cart', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `serviceName=${serviceName}`  // Send the service name to remove
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(`Removed "${serviceName}" from cart!`);
+            location.reload();  // Reload the page to reflect changes
+        } else {
+            alert('Failed to remove item from cart. Please try again.');
+        }
+    })
+    .catch(error => console.error('Error removing item:', error));
+}
+</script>
+
+
+	<script
+		src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+	<script
+		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

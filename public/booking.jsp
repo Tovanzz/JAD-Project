@@ -28,14 +28,12 @@
 }
 </style>
 
-<!-- Custom styles for this template -->
-<link href="css/pricing.css" rel="stylesheet">
 </head>
 <body>
 
 	<!-- Include header HTML -->
 	<jsp:include page="header.html" />
-	
+
 	<main>
 		<section class="py-5 text-center container">
 			<div class="row py-lg-5">
@@ -72,8 +70,9 @@
 									<li>Help center access</li>
 								</ul>
 								<button type="button"
-									class="w-100 btn btn-lg btn-outline-primary">Sign up
-									for free</button>
+									class="w-100 btn btn-lg btn-outline-primary book-now-btn"
+									data-service-name="Home Cleaning" data-service-price="16">
+									Book Now</button>
 							</div>
 						</div>
 					</div>
@@ -92,8 +91,11 @@
 									<li>Priority email support</li>
 									<li>Help center access</li>
 								</ul>
-								<button type="button" class="w-100 btn btn-lg btn-primary">Get
-									Started</button>
+								<button type="button"
+									class="w-100 btn btn-lg btn-primary book-now-btn"
+									data-service-name="Office Cleaning" data-service-price="30">
+									Book Now</button>
+
 							</div>
 						</div>
 					</div>
@@ -113,8 +115,8 @@
 									<li>Phone and email support</li>
 									<li>Help center access</li>
 								</ul>
-								<button type="button" class="w-100 btn btn-lg btn-primary">Contact
-									Us</button>
+								<button type="button" class="w-100 btn btn-lg btn-primary">Book
+									Now</button>
 							</div>
 						</div>
 					</div>
@@ -155,6 +157,49 @@
 	<!-- Render Footer -->
 	<jsp:include page="footer.html" />
 
+	<script>
+	document.addEventListener('DOMContentLoaded', () => {
+        const bookNowButtons = document.querySelectorAll('.book-now-btn');
+
+        bookNowButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const serviceName = button.getAttribute('data-service-name');
+                const servicePrice = button.getAttribute('data-service-price');
+
+                // Ensure the values are correctly logged
+                console.log('serviceName:', serviceName);
+                console.log('servicePrice:', servicePrice);
+
+                const params = new URLSearchParams();
+                params.append('serviceName', serviceName);
+                params.append('servicePrice', servicePrice);
+
+                fetch('/JAD-CA1/add-to-cart', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: params.toString()
+                })
+
+
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('cart-badge').textContent = data.itemCount;
+                        alert(`Added "${serviceName}" to cart! Total items: ${data.itemCount}`);
+                    } else {
+                        alert('Failed to add to cart. Please try again.');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            });
+        });
+    });
+	</script>
+
+	<script
+		src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+	<script
+		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 	<script src="assets/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

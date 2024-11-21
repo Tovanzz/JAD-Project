@@ -32,7 +32,7 @@
 <body>
 
 	<!-- Include header HTML -->
-	<jsp:include page="header.html" />
+	<jsp:include page="header.jsp" />
 
 	<main>
 		<section class="py-5 text-center container">
@@ -155,7 +155,7 @@
 	</main>
 
 	<!-- Render Footer -->
-	<jsp:include page="footer.html" />
+	<jsp:include page="footer.jsp" />
 
 	<script>
 	document.addEventListener('DOMContentLoaded', () => {
@@ -198,8 +198,6 @@
 
 	<script
 		src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
-	<script
-		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 	<script src="assets/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

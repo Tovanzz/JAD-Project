@@ -5,7 +5,7 @@
 <link href="assets/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-	<jsp:include page="header.html" />
+	<jsp:include page="header.jsp" />
 
 	<main class="container py-5">
 		<h1>Your Cart</h1>

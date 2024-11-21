@@ -1,10 +1,8 @@
 <%@page import="java.sql.*"%>
 <%
-int id = 0;
-String name = request.getParameter("username");
-String password = request.getParameter("password");
-
-if (name != null && password != null) {
+String email = request.getParameter("email");
+String confirmEmail;
+if (email != null) {
 	try {
 		// Step1: Load JDBC Driver
 		Class.forName("org.postgresql.Driver");
@@ -21,19 +19,20 @@ if (name != null && password != null) {
 		Statement stmt = conn.createStatement();
 
 		// Step 5: Execute SQL Command
-		String insertStr = "SELECT * FROM users WHERE name=? AND password=?";
-		PreparedStatement pstmt = conn.prepareStatement(insertStr);
-		pstmt.setString(1, name);
-		pstmt.setString(2, password);
+		String strStr = "SELECT email FROM users WHERE email=?";
+		PreparedStatement pstmt = conn.prepareStatement(strStr);
+		pstmt.setString(1, email);
 		ResultSet rs = pstmt.executeQuery();
 
 		// Step 6: Process Result
 		if (rs.next()) {
-	id = rs.getInt("id");
-	session.setAttribute("userRoleId", id);
-	response.sendRedirect("index.jsp");
+	confirmEmail = rs.getString("email");
+	session.setAttribute("email", confirmEmail);
+out.println("Redirecting to verifyPassword.jsp"); // Debug log
+	response.sendRedirect("verifyPassword.jsp");
 		} else {
-	session.setAttribute("loginError", "Invalid username or password. Please try again.");
+			out.println("Email not found in database: " + email);
+	session.setAttribute("loginError", "Incorrect email. Try again");
 		}
 		conn.close();
 	} catch (Exception e) {
@@ -49,7 +48,7 @@ if (name != null && password != null) {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="X-UA-Compatible" content="ie=edge">
-<title>Login</title>
+<title>Forgot Password</title>
 <link rel="stylesheet" href="css/login.css">
 
 <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css'
@@ -58,21 +57,11 @@ if (name != null && password != null) {
 
 <body>
 	<div class="wrapper">
-		<form action="login.jsp" method="post">
-			<h1>Login</h1>
+		<form action="forgotPassword.jsp" method="post">
+			<p>Enter your email</p>
 			<div class="input-box">
-				<input type="text" placeholder="Username" name="username" required>
-				<i class='bx bxs-user'></i>
-			</div>
-
-			<div class="input-box">
-				<input type="password" placeholder="Password" name="password"
-					required> <i class='bx bxs-lock-alt'></i>
-			</div>
-
-			<div class="remember-forgot">
-				<label><input type="checkbox"> Remember me</label> <a
-					href="forgotPassword.jsp"> Forgot password?</a>
+				<input type="email" placeholder="Email" name="email" required>
+				<i class='bx bxs-envelope'></i>
 			</div>
 
 			<%
@@ -85,13 +74,7 @@ if (name != null && password != null) {
 			<%
 			}
 			%>
-			<button type="submit" class="btn" style="margin-top: 20px;">Login</button>
-
-			<div class="register-link">
-				<p>
-					Don't have an account? <a href="registerMember.jsp">Register</a>
-				</p>
-			</div>
+			<button type="submit" class="btn" style="margin-top: 20px;">Confirm Email</button>
 		</form>
 	</div>
 </body>

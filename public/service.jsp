@@ -1,44 +1,49 @@
 <%@page import="java.util.*, java.sql.*"%>
 <%
-int serviceCategoryId;
+String id = request.getParameter("id");
 String category;
 String description;
 String image_url;
 
-List<Map<String, String>> servicesCategory = new ArrayList<>();
+List<Map<String, String>> services = new ArrayList<>();
 
-try {
-	// Step1: Load JDBC Driver
-	Class.forName("org.postgresql.Driver");
+if (id != null) {
+	int serviceCategoryId = Integer.parseInt(id);
 
-	// Step 2: Define Connection URL
-	String connURL = "jdbc:postgresql://ep-late-flower-a15dwl0h.ap-southeast-1.aws.neon.tech/cleaningService?sslmode=require";
-	String dbUsername = "neondb_owner";
-	String dbPassword = "fbtpKBzO01Jl";
+	try {
+		// Step1: Load JDBC Driver
+		Class.forName("org.postgresql.Driver");
 
-	// Step 3: Establish connection to URL
-	Connection conn = DriverManager.getConnection(connURL, dbUsername, dbPassword);
+		// Step 2: Define Connection URL
+		String connURL = "jdbc:postgresql://ep-late-flower-a15dwl0h.ap-southeast-1.aws.neon.tech/cleaningService?sslmode=require";
+		String dbUsername = "neondb_owner";
+		String dbPassword = "fbtpKBzO01Jl";
 
-	// Step 4: Create Statement object
-	Statement stmt = conn.createStatement();
+		// Step 3: Establish connection to URL
+		Connection conn = DriverManager.getConnection(connURL, dbUsername, dbPassword);
 
-	// Step 5: Execute SQL Command
-	String sqlStr = "SELECT * FROM service_category ORDER BY id";
-	ResultSet rs = stmt.executeQuery(sqlStr);
+		// Step 4: Create Statement object
+		Statement stmt = conn.createStatement();
 
-	// Step 6: Process Result
-	while (rs.next()) {
-		Map<String, String> serviceCategory = new HashMap<>();
-		serviceCategory.put("service_category_id", rs.getString("id"));
-		serviceCategory.put("category", rs.getString("category"));
-		serviceCategory.put("description", rs.getString("description"));
-		serviceCategory.put("image_url", rs.getString("category_image_url"));
-		servicesCategory.add(serviceCategory);
+		// Step 5: Execute SQL Command
+		String sqlStr = "SELECT * FROM service WHERE category_id = ? ORDER BY id";
+		PreparedStatement pstmt = conn.prepareStatement(sqlStr);
+		pstmt.setInt(1, serviceCategoryId);
+		ResultSet rs = pstmt.executeQuery();
+
+		// Step 6: Process Result
+		while (rs.next()) {
+	Map<String, String> service = new HashMap<>();
+	service.put("service_name", rs.getString("service_name"));
+	service.put("description", rs.getString("description"));
+	service.put("image_url", rs.getString("image_url"));
+	services.add(service);
+		}
+
+		conn.close();
+	} catch (Exception e) {
+		out.println("Error :" + e);
 	}
-
-	conn.close();
-} catch (Exception e) {
-	out.println("Error :" + e);
 }
 %>
 
@@ -98,25 +103,20 @@ try {
 			<div class="container">
 				<div class="row row-cols-1 row-cols-md-3 g-4">
 					<%
-					for (Map<String, String> serviceCategory : servicesCategory) {
+					for (Map<String, String> service : services) {
 					%>
 					<div class="col">
 						<div class="card shadow-sm h-100">
 							<!-- Replace the SVG placeholder with an actual image -->
-							<img src="<%=serviceCategory.get("image_url")%>" class="card-img-top"
-								alt="<%=serviceCategory.get("category")%>" height="225" />
+							<img src="<%=service.get("image_url")%>" class="card-img-top"
+								alt="<%=service.get("category")%>" height="225" />
 
 							<div class="card-body">
-								<h2 class="text-center"><%=serviceCategory.get("category")%></h2>
-								<p class="card-text"><%=serviceCategory.get("description")%></p>
+								<h2 class="text-center"><%=service.get("service_name")%></h2>
+								<p class="card-text"><%=service.get("description")%></p>
 								<div class="d-flex justify-content-between align-items-center">
 									<div class="btn-group">
-										<form action="service.jsp" method="post">
-											<input type="hidden" name="id"
-												value=<%=serviceCategory.get("service_category_id")%>>
-											<button type="submit"
-												class="btn btn-sm btn-outline-secondary">View</button>
-										</form>
+										<button type="button" class="btn btn-sm btn-outline-secondary">View</button>
 										<%
 										Integer userRoleId = (Integer) session.getAttribute("userRoleId");
 										if (userRoleId != null && userRoleId == 1) {

@@ -7,7 +7,7 @@ String loginError = null;
 
 if (name != null && password != null) {
 	try {
-		// Step1: Load JDBC Driver
+		// Step 1: Load JDBC Driver
 		Class.forName("org.postgresql.Driver");
 
 		// Step 2: Define Connection URL
@@ -22,16 +22,22 @@ if (name != null && password != null) {
 		Statement stmt = conn.createStatement();
 
 		// Step 5: Execute SQL Command
-		String insertStr = "SELECT * FROM users WHERE name=? AND password=?";
-		PreparedStatement pstmt = conn.prepareStatement(insertStr);
+		String queryStr = "SELECT id, user_role_id FROM users WHERE name=? AND password=?";
+		PreparedStatement pstmt = conn.prepareStatement(queryStr);
 		pstmt.setString(1, name);
 		pstmt.setString(2, password);
 		ResultSet rs = pstmt.executeQuery();
 
 		// Step 6: Process Result
 		if (rs.next()) {
+	// Fetch the correct user_role_id and store it in session
+	int userRoleId = rs.getInt("user_role_id");
+	session.setAttribute("userRoleId", userRoleId);
+
+	// Optional: Store user ID or other data if needed
 	id = rs.getInt("id");
-	session.setAttribute("userRoleId", id);
+	session.setAttribute("userId", id);
+
 	response.sendRedirect("index.jsp");
 		} else {
 	loginError = "Invalid username or password. Please try again.";

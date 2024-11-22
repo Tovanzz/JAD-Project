@@ -1,33 +1,37 @@
 <%@page import="java.sql.*"%>
 <%
-Integer userRoleId = (Integer) session.getAttribute("userRoleId");
-if (userRoleId == null) {
+Integer userId = (Integer) session.getAttribute("userId");
+if (userId == null) {
 	response.sendRedirect("login.jsp");
 }
 
 String userName = "";
 String userEmail = "";
-String userRole = ""; // To store the role ("Admin" or "Member")
+String userRole = "";
+String userPhone = "";
+String userAddress = "";
+String userDob = "";
 
 try {
-	// Load PostgreSQL Driver
 	Class.forName("org.postgresql.Driver");
 	String connURL = "jdbc:postgresql://ep-late-flower-a15dwl0h.ap-southeast-1.aws.neon.tech/cleaningService?sslmode=require";
 	String dbUsername = "neondb_owner";
 	String dbPassword = "fbtpKBzO01Jl";
 	Connection conn = DriverManager.getConnection(connURL, dbUsername, dbPassword);
 
-	// Query to retrieve user details and role
-	String query = "SELECT u.name, u.email, r.role " + "FROM users u " + "JOIN user_role r ON u.user_role_id = r.id "
-	+ "WHERE u.id = ?";
+	String query = "SELECT u.name, u.email, u.phone_number, u.address, u.date_of_birth, r.role " + "FROM users u "
+	+ "JOIN user_role r ON u.user_role_id = r.id " + "WHERE u.id = ?";
 	PreparedStatement pstmt = conn.prepareStatement(query);
-	pstmt.setInt(1, userRoleId);
+	pstmt.setInt(1, userId);
 	ResultSet rs = pstmt.executeQuery();
 
 	if (rs.next()) {
 		userName = rs.getString("name");
 		userEmail = rs.getString("email");
-		userRole = rs.getString("role"); // Get the role directly from user_role table
+		userPhone = rs.getString("phone_number");
+		userAddress = rs.getString("address");
+		userDob = rs.getDate("date_of_birth") != null ? rs.getDate("date_of_birth").toString() : "";
+		userRole = rs.getString("role");
 	}
 	conn.close();
 } catch (Exception e) {
@@ -41,7 +45,6 @@ try {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>User Profile</title>
-<!-- Bootstrap CSS -->
 <link href="assets/dist/css/bootstrap.min.css" rel="stylesheet">
 <style>
 body {
@@ -100,21 +103,20 @@ body {
 }
 </style>
 <script>
-    function toggleField(inputId) {
-        const input = document.getElementById(inputId);
-        input.readOnly = !input.readOnly;
+        function toggleField(inputId) {
+            const input = document.getElementById(inputId);
+            input.readOnly = !input.readOnly;
 
-        // Enable save button if any field is editable
-        const saveBtn = document.getElementById("saveChangesBtn");
-        const fields = document.querySelectorAll('.form-control');
-        const isEditable = Array.from(fields).some(field => !field.readOnly);
+            // Enable save button if any field is editable
+            const saveBtn = document.getElementById("saveChangesBtn");
+            const fields = document.querySelectorAll('.form-control');
+            const isEditable = Array.from(fields).some(field => !field.readOnly);
 
-        saveBtn.style.display = isEditable ? "block" : "none";
-    }
-</script>
+            saveBtn.style.display = isEditable ? "block" : "none";
+        }
+    </script>
 </head>
 <body>
-	<!-- Include Header -->
 	<jsp:include page="header.jsp" />
 
 	<div class="container mt-5">
@@ -123,15 +125,14 @@ body {
 			<img src="img/pfp.jpg" alt="Profile Picture">
 			<h2><%=userName%></h2>
 			<p class="mb-0"><%=userRole%></p>
-			<!-- Display the user's role -->
 		</div>
 
 		<!-- Profile Details Card -->
 		<div class="profile-card">
 			<form action="updateUserProfile.jsp" method="post">
 				<div class="row">
-					<!-- Right Column: Contact & Basic Info -->
-					<div class="col-md-8">
+					<!-- Left Column: Name, Email, Role -->
+					<div class="col-md-6">
 						<div class="info-section d-flex align-items-center">
 							<h6 class="me-3">Name:</h6>
 							<input type="text" id="name" name="name"
@@ -151,20 +152,34 @@ body {
 							<input type="text" class="form-control w-50 me-2"
 								value="<%=userRole%>" readonly>
 						</div>
-						<div class="info-section">
-							<h6>Phone</h6>
-							<p>+1 123 456 7890</p>
+					</div>
+
+					<!-- Right Column: Phone, Address, Birthday -->
+					<div class="col-md-6">
+						<div class="info-section d-flex align-items-center">
+							<h6 class="me-3">Phone:</h6>
+							<input type="text" id="phone" name="phone"
+								class="form-control w-50 me-2" value="<%=userPhone%>" readonly>
+							<button type="button" class="btn-edit"
+								onclick="toggleField('phone')">Edit</button>
 						</div>
-						<div class="info-section">
-							<h6>Address</h6>
-							<p>525 E 68th Street, New York, NY 10551</p>
+						<div class="info-section d-flex align-items-center">
+							<h6 class="me-3">Address:</h6>
+							<input type="text" id="address" name="address"
+								class="form-control w-50 me-2" value="<%=userAddress%>" readonly>
+							<button type="button" class="btn-edit"
+								onclick="toggleField('address')">Edit</button>
 						</div>
-						<div class="info-section">
-							<h6>Birthday</h6>
-							<p>June 5, 1992</p>
+						<div class="info-section d-flex align-items-center">
+							<h6 class="me-3">Birthday:</h6>
+							<input type="date" id="dob" name="dob"
+								class="form-control w-50 me-2" value="<%=userDob%>" readonly>
+							<button type="button" class="btn-edit"
+								onclick="toggleField('dob')">Edit</button>
 						</div>
 					</div>
 				</div>
+
 				<!-- Save Changes Button -->
 				<div class="text-center">
 					<button type="submit" class="btn btn-success w-100"
@@ -174,10 +189,7 @@ body {
 		</div>
 	</div>
 
-	<!-- Include Footer -->
 	<jsp:include page="footer.jsp" />
-
-	<!-- Bootstrap JS Bundle -->
 	<script
 		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

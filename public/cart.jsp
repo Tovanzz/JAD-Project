@@ -1,3 +1,44 @@
+<%@page import="java.util.*, java.sql.*"%>
+<%
+Integer userRoleId = (Integer) session.getAttribute("userRoleId");
+List<Map<String, String>> bookings = new ArrayList<>();
+
+try {
+	// Step1: Load JDBC Driver
+	Class.forName("org.postgresql.Driver");
+
+	// Step 2: Define Connection URL
+	String connURL = "jdbc:postgresql://ep-late-flower-a15dwl0h.ap-southeast-1.aws.neon.tech/cleaningService?sslmode=require";
+	String dbUsername = "neondb_owner";
+	String dbPassword = "fbtpKBzO01Jl";
+
+	// Step 3: Establish connection to URL
+	Connection conn = DriverManager.getConnection(connURL, dbUsername, dbPassword);
+
+	// Step 4: Create Statement object
+	Statement stmt = conn.createStatement();
+
+	// Step 5: Execute SQL Command
+	String sqlStr = "SELECT s.service_name, b.date_for_service, b.time_for_service FROM booking b JOIN service s ON b.service_id = s.id WHERE b.user_id = ? ORDER BY b.id";
+	PreparedStatement pstmt = conn.prepareStatement(sqlStr);
+	pstmt.setInt(1, userRoleId);
+	ResultSet rs = pstmt.executeQuery();
+
+	// Step 6: Process Result
+	while (rs.next()) {
+		Map<String, String> booking = new HashMap<>();
+		booking.put("service_name", rs.getString("service_name"));
+		booking.put("date_for_service", rs.getString("date_for_service"));
+		booking.put("time_for_service", rs.getString("time_for_service"));
+		bookings.add(booking);
+	}
+
+	conn.close();
+} catch (Exception e) {
+	out.println("Error :" + e);
+}
+%>
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -10,28 +51,45 @@
 	<main class="container py-5">
 		<h1>Your Cart</h1>
 
-		<!-- Hero section if the cart is empty -->
-		<div id="hero-section" class="alert alert-info text-center"
-			style="display: none;">
+		<%
+		if (bookings.isEmpty()) {
+		%>
+		<div id="hero-section" class="alert alert-info text-center">
 			<h3>Your cart is empty</h3>
 			<p>It looks like you haven't added any services to your cart.
 				Please visit our services page to book a service.</p>
 		</div>
-
-		<!-- Cart items table -->
-		<table id="cart-table" class="table table-striped"
-			style="display: none;">
+		<%
+		} else {
+		%>
+		<!-- Cart Items Table -->
+		<table id="cart-table" class="table table-striped">
 			<thead>
 				<tr>
 					<th>Service Name</th>
-					<th>Price</th>
-					<th>Actions</th>
+					<th>Date</th>
+					<th>Time</th>
 				</tr>
 			</thead>
-			<tbody id="cart-items"></tbody>
+			<tbody>
+				<%
+				for (Map<String, String> booking : bookings) {
+				%>
+				<tr>
+					<td><%=booking.get("service_name")%></td>
+					<td><%=booking.get("date_for_service")%></td>
+					<td><%=booking.get("time_for_service")%></td>
+				</tr>
+				<%
+				}
+				%>
+			</tbody>
 		</table>
+		<%
+		}
+		%>
 	</main>
-
+	<!-- 
 	<script>
 document.addEventListener('DOMContentLoaded', () => {
     // Fetch cart items from the server
@@ -118,7 +176,7 @@ function removeCartItem(serviceName) {
     .catch(error => console.error('Error removing item:', error));
 }
 </script>
-
+-->
 
 	<script
 		src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>

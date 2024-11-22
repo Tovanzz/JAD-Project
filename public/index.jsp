@@ -1,10 +1,5 @@
 <%@page import="java.util.*, java.sql.*"%>
 <%
-int serviceCategoryId;
-String category;
-String description;
-String image_url;
-
 List<Map<String, String>> servicesCategory = new ArrayList<>();
 
 try {
@@ -78,6 +73,17 @@ try {
 	<jsp:include page="header.jsp" />
 
 	<main>
+		<%
+		String successMessage = (String) session.getAttribute("successMessage");
+		if (successMessage != null) {
+		%>
+		<div class="alert alert-danger" role="alert" style="text-align: center;">
+			<%=successMessage%>
+		</div>
+		<%
+		session.removeAttribute("successMessage");
+		}
+		%>
 		<section class="py-5 text-center container">
 			<div class="row py-lg-5">
 				<div class="col-lg-6 col-md-8 mx-auto">
@@ -103,8 +109,9 @@ try {
 					<div class="col">
 						<div class="card shadow-sm h-100">
 							<!-- Replace the SVG placeholder with an actual image -->
-							<img src="<%=serviceCategory.get("image_url")%>" class="card-img-top"
-								alt="<%=serviceCategory.get("category")%>" height="225" />
+							<img src="<%=serviceCategory.get("image_url")%>"
+								class="card-img-top" alt="<%=serviceCategory.get("category")%>"
+								height="225" />
 
 							<div class="card-body">
 								<h2 class="text-center"><%=serviceCategory.get("category")%></h2>

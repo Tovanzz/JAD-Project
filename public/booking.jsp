@@ -1,3 +1,45 @@
+<%@page import="java.util.*, java.sql.*"%>
+<%
+String id;
+List<Map<String, String>> servicesCategory = new ArrayList<>();
+
+try {
+	// Step1: Load JDBC Driver
+	Class.forName("org.postgresql.Driver");
+
+	// Step 2: Define Connection URL
+	String connURL = "jdbc:postgresql://ep-late-flower-a15dwl0h.ap-southeast-1.aws.neon.tech/cleaningService?sslmode=require";
+	String dbUsername = "neondb_owner";
+	String dbPassword = "fbtpKBzO01Jl";
+
+	// Step 3: Establish connection to URL
+	Connection conn = DriverManager.getConnection(connURL, dbUsername, dbPassword);
+
+	// Step 4: Create Statement object
+	Statement stmt = conn.createStatement();
+
+	// Step 5: Execute SQL Command
+	String sqlStr = "SELECT * FROM service_category ORDER BY id";
+	ResultSet rs = stmt.executeQuery(sqlStr);
+
+	// Step 6: Process Result
+	while (rs.next()) {
+		Map<String, String> serviceCategory = new HashMap<>();
+		serviceCategory.put("id", rs.getString("id"));
+		serviceCategory.put("service_category", rs.getString("category"));
+		serviceCategory.put("description", rs.getString("description"));
+		double price = rs.getDouble("package_price");
+		String packagePrice = String.format("%.2f", price);
+		serviceCategory.put("package_price", packagePrice);
+		servicesCategory.add(serviceCategory);
+	}
+
+	conn.close();
+} catch (Exception e) {
+	out.println("Error :" + e);
+}
+%>
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -52,77 +94,49 @@
 			</div>
 		</section>
 
+		<%
+		String bookingError = (String) session.getAttribute("bookingError");
+		if (bookingError != null) {
+		%>
+		<div class="alert alert-success" role="alert"
+			style="text-align: center;">
+			<%=bookingError%>
+		</div>
+		<%
+		session.removeAttribute("bookingError");
+		}
+		%>
 		<div class="album py-5 bg-light">
 			<div class="container">
 				<div class="row row-cols-1 row-cols-md-3 mb-3 text-center">
+					<%
+					for (Map<String, String> serviceCategory : servicesCategory) {
+					%>
 					<div class="col">
 						<div class="card mb-4 rounded-3 shadow-sm">
 							<div class="card-header py-3">
-								<h4 class="my-0 fw-normal">Home Cleaning</h4>
+								<h4 class="my-0 fw-normal"><%=serviceCategory.get("service_category")%></h4>
 							</div>
 							<div class="card-body">
 								<h1 class="card-title pricing-card-title">
-									$16<small class="text-muted fw-light">/hr</small>
+									$<%=serviceCategory.get("package_price")%><small
+										class="text-muted fw-light">/hr</small>
 								</h1>
-								<ul class="list-unstyled mt-3 mb-4">
-									<li>10 users included</li>
-									<li>2 GB of storage</li>
-									<li>Email support</li>
-									<li>Help center access</li>
-								</ul>
-								<button type="button"
-									class="w-100 btn btn-lg btn-outline-primary book-now-btn"
-									data-service-name="Home Cleaning" data-service-price="16">
-									Book Now</button>
+								<p>
+									<%=serviceCategory.get("description")%></p>
+								<form action="bookingService.jsp" method="post">
+									<input type="hidden" name="id"
+										value=<%=serviceCategory.get("id")%>>
+									<button type="submit"
+										class="w-100 btn btn-lg btn-outline-primary book-now-btn">
+										Book Now</button>
+								</form>
 							</div>
 						</div>
 					</div>
-					<div class="col">
-						<div class="card mb-4 rounded-3 shadow-sm">
-							<div class="card-header py-3">
-								<h4 class="my-0 fw-normal">Office Cleaning</h4>
-							</div>
-							<div class="card-body">
-								<h1 class="card-title pricing-card-title">
-									$30<small class="text-muted fw-light">/hr</small>
-								</h1>
-								<ul class="list-unstyled mt-3 mb-4">
-									<li>20 users included</li>
-									<li>10 GB of storage</li>
-									<li>Priority email support</li>
-									<li>Help center access</li>
-								</ul>
-								<button type="button"
-									class="w-100 btn btn-lg btn-primary book-now-btn"
-									data-service-name="Office Cleaning" data-service-price="30">
-									Book Now</button>
-
-							</div>
-						</div>
-					</div>
-					<div class="col">
-						<div class="card mb-4 rounded-3 shadow-sm border-primary">
-							<div
-								class="card-header py-3 text-white bg-primary border-primary">
-								<h4 class="my-0 fw-normal">Carpet & Upholstrey Cleaning</h4>
-							</div>
-							<div class="card-body">
-								<h1 class="card-title pricing-card-title">
-									$45<small class="text-muted fw-light">/hr</small>
-								</h1>
-								<ul class="list-unstyled mt-3 mb-4">
-									<li>30 users included</li>
-									<li>15 GB of storage</li>
-									<li>Phone and email support</li>
-									<li>Help center access</li>
-								</ul>
-								<button type="button"
-									class="w-100 btn btn-lg btn-primary book-now-btn"
-									data-service-name="Office Cleaning" data-service-price="30">
-									Book Now</button>
-							</div>
-						</div>
-					</div>
+					<%
+					}
+					%>
 				</div>
 			</div>
 		</div>
@@ -159,7 +173,7 @@
 
 	<!-- Render Footer -->
 	<jsp:include page="footer.html" />
-
+	<!--
 	<script> 
  document.addEventListener('DOMContentLoaded', () => { 
         const bookNowButtons = document.querySelectorAll('.book-now-btn'); 
@@ -198,6 +212,7 @@
         }); 
     }); 
  </script>
+ -->
 	<script
 		src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
 	<script

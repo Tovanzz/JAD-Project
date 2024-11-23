@@ -8,15 +8,16 @@
 <%
 //Initalised variables
 String id = request.getParameter("id");
-String serviceName = request.getParameter("serviceName");
+String category = request.getParameter("category");
 String description = request.getParameter("description");
+String price = request.getParameter("price");
 String imageUrl = request.getParameter("imageUrl");
-int serviceId = 0;
+int serviceCategoryId = 0;
 
 List<Map<String, String>> services = new ArrayList<>();
 
 if (id != null) {
-	serviceId = Integer.parseInt(id);
+	serviceCategoryId = Integer.parseInt(id);
 	try {
 		// Step1: Load JDBC Driver
 		Class.forName("org.postgresql.Driver");
@@ -33,12 +34,14 @@ if (id != null) {
 		Statement stmt = conn.createStatement();
 
 		// Step 5: Execute SQL Command
-		String sqlStr = "UPDATE service SET service_name = ?, description = ?, image_url = ? WHERE id = ?";
+		String sqlStr = "UPDATE service_category SET category = ?, description = ?, category_image_url = ?, price_per_hour = ? WHERE id = ?";
 		PreparedStatement pstmt = conn.prepareStatement(sqlStr);
-		pstmt.setString(1, serviceName);
+		pstmt.setString(1, category);
 		pstmt.setString(2, description);
 		pstmt.setString(3, imageUrl);
-		pstmt.setInt(4, serviceId);
+		Double priceCategory = Double.parseDouble(price); 
+		pstmt.setDouble(4, priceCategory);
+		pstmt.setInt(5, serviceCategoryId);
 		int count = pstmt.executeUpdate();
 
 		// Step 6: Process Result

@@ -1,5 +1,12 @@
+<!--
+    Author: Tan Rui Zhang Jovan
+    Admin No: p2322951
+    Class: DIT/FT/2A/23
+    Date:  23 November 2024 
+-->
 <%@page import="java.sql.*"%>
 <%
+//Initalised variables
 int id = 2;
 String name = request.getParameter("name");
 String email = request.getParameter("email");

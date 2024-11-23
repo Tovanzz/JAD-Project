@@ -1,13 +1,18 @@
-<%@page import="java.sql.*"%>
+<!--
+    Author: Tan Rui Zhang Jovan
+    Admin No: p2322951
+    Class: DIT/FT/2A/23
+    Date:  23 November 2024 
+-->
+
+<%@page import="java.util.*, java.sql.*"%>
 <%
-int id = 0;
-String name = request.getParameter("name");
-String email = request.getParameter("email");
-String password = request.getParameter("password");
+//Initalised variables
+String id = request.getParameter("id");
+int serviceId = 0;
 
-if (name != null && !name.trim().isEmpty() && email != null && !email.trim().isEmpty() && password != null
-		&& !password.trim().isEmpty()) {
-
+if (id != null) {
+	serviceId = Integer.parseInt(id);
 	try {
 		// Step1: Load JDBC Driver
 		Class.forName("org.postgresql.Driver");
@@ -24,18 +29,20 @@ if (name != null && !name.trim().isEmpty() && email != null && !email.trim().isE
 		Statement stmt = conn.createStatement();
 
 		// Step 5: Execute SQL Command
-		String insertStr = "DELETE service WHERE id = ?";
-		PreparedStatement pstmt = conn.prepareStatement(insertStr);
+		String sqlStr = "Delete FROM service WHERE id = ?";
+		PreparedStatement pstmt = conn.prepareStatement(sqlStr);
 		pstmt.setInt(1, serviceId);
 		int count = pstmt.executeUpdate();
 
 		// Step 6: Process Result
 		if (count > 0) {
-	response.sendRedirect("index.jsp");
+		session.setAttribute("deleteSuccessfully", "Deleted successfully!");
+		response.sendRedirect("index.jsp");
 		}
 		conn.close();
 	} catch (Exception e) {
-		out.println("Error :" + e);
+		out.println("Error: " + e);
 	}
 }
 %>
+

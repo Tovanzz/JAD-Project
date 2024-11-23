@@ -1,5 +1,13 @@
+<!--
+    Author: Tan Rui Zhang Jovan, GERALD SIM KANG LE
+    Admin No: p2322951, p2209319
+    Class: DIT/FT/2A/23
+    Date:  23 November 2024 
+-->
+
 <%@page import="java.util.*, java.sql.*"%>
 <%
+//Initalised variables
 String id;
 List<Map<String, String>> servicesCategory = new ArrayList<>();
 
@@ -28,9 +36,9 @@ try {
 		serviceCategory.put("id", rs.getString("id"));
 		serviceCategory.put("service_category", rs.getString("category"));
 		serviceCategory.put("description", rs.getString("description"));
-		double price = rs.getDouble("package_price");
-		String packagePrice = String.format("%.2f", price);
-		serviceCategory.put("package_price", packagePrice);
+		double price = rs.getDouble("price_per_hour");
+		String price_per_hour = String.format("%.2f", price);
+		serviceCategory.put("price_per_hour", price_per_hour);
 		servicesCategory.add(serviceCategory);
 	}
 
@@ -49,7 +57,7 @@ try {
 <meta name="author"
 	content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
 <meta name="generator" content="Hugo 0.84.0">
-<title>Pricing Example</title>
+<title>Booking</title>
 
 <!-- Bootstrap core CSS -->
 <link href="assets/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -81,24 +89,26 @@ try {
 		<section class="py-5 text-center container">
 			<div class="row py-lg-5">
 				<div class="col-lg-6 col-md-8 mx-auto">
-					<h1 class="fw-light">Pricing Example</h1>
-					<p class="lead text-muted">Quickly build an effective pricing
-						table for your potential customers with this Bootstrap example.
-						It’s built with default Bootstrap components and utilities with
-						little customization.</p>
-					<p>
-						<a href="#" class="btn btn-primary my-2">Main Call to Action</a> <a
-							href="#" class="btn btn-secondary my-2">Secondary Action</a>
-					</p>
+					<h1 class="fw-light">About booking</h1>
+					<p class="lead text-muted">Booking a cleaning service allows
+						you to schedule professional cleaning for your home or office. You
+						can select from a range of services such as regular cleaning, deep
+						cleaning, or specialized tasks like carpet or window cleaning. The
+						booking process typically includes choosing a convenient time,
+						providing details about the space to be cleaned, and confirming
+						your payment. Many services also offer customizable options to
+						meet specific needs, ensuring a thorough and personalized cleaning
+						experience.</p>
 				</div>
 			</div>
 		</section>
 
+		<!-- Error message -->
 		<%
 		String bookingError = (String) session.getAttribute("bookingError");
 		if (bookingError != null) {
 		%>
-		<div class="alert alert-success" role="alert"
+		<div class="alert alert-danger" role="alert"
 			style="text-align: center;">
 			<%=bookingError%>
 		</div>
@@ -106,6 +116,8 @@ try {
 		session.removeAttribute("bookingError");
 		}
 		%>
+		
+		<!-- Different bookings options for cleaning service -->
 		<div class="album py-5 bg-light">
 			<div class="container">
 				<div class="row row-cols-1 row-cols-md-3 mb-3 text-center">
@@ -119,7 +131,7 @@ try {
 							</div>
 							<div class="card-body">
 								<h1 class="card-title pricing-card-title">
-									$<%=serviceCategory.get("package_price")%><small
+									$<%=serviceCategory.get("price_per_hour")%><small
 										class="text-muted fw-light">/hr</small>
 								</h1>
 								<p>
@@ -140,79 +152,11 @@ try {
 				</div>
 			</div>
 		</div>
-
-		<h2 class="display-6 text-center mb-4">Compare Plans</h2>
-		<div class="table-responsive">
-			<table class="table text-center">
-				<thead>
-					<tr>
-						<th style="width: 34%;"></th>
-						<th style="width: 22%;">Free</th>
-						<th style="width: 22%;">Pro</th>
-						<th style="width: 22%;">Enterprise</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<th scope="row" class="text-start">Public</th>
-						<td>&#10004;</td>
-						<td>&#10004;</td>
-						<td>&#10004;</td>
-					</tr>
-					<tr>
-						<th scope="row" class="text-start">Private</th>
-						<td></td>
-						<td>&#10004;</td>
-						<td>&#10004;</td>
-					</tr>
-					<!-- Add more rows as needed -->
-				</tbody>
-			</table>
-		</div>
 	</main>
 
 	<!-- Render Footer -->
-	<jsp:include page="footer.html" />
-	<!--
-	<script> 
- document.addEventListener('DOMContentLoaded', () => { 
-        const bookNowButtons = document.querySelectorAll('.book-now-btn'); 
- 
-        bookNowButtons.forEach(button => { 
-            button.addEventListener('click', () => { 
-                const serviceName = button.getAttribute('data-service-name'); 
-                const servicePrice = button.getAttribute('data-service-price'); 
- 
-                // Ensure the values are correctly logged 
-                console.log('serviceName:', serviceName); 
-                console.log('servicePrice:', servicePrice); 
- 
-                const params = new URLSearchParams(); 
-                params.append('serviceName', serviceName); 
-                params.append('servicePrice', servicePrice); 
- 
-                fetch('/JAD_Project/add-to-cart', { 
-                    method: 'POST', 
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, 
-                    body: params.toString() 
-                }) 
- 
- 
-                .then(response => response.json()) 
-                .then(data => { 
-                    if (data.success) { 
-                        document.getElementById('cart-badge').textContent = data.itemCount; 
-                        alert(`Added "${serviceName}" to cart! Total items: ${data.itemCount}`); 
-                    } else { 
-                        alert('Failed to add to cart. Please try again.'); 
-                    } 
-                }) 
-                .catch(error => console.error('Error:', error)); 
-            }); 
-        }); 
-    }); 
- </script>
- -->
+	<jsp:include page="footer.jsp" />
+
 	<script
 		src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
 	<script

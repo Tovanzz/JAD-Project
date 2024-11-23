@@ -1,41 +1,52 @@
+<!--
+    Author: Tan Rui Zhang Jovan
+    Admin No: p2322951
+    Class: DIT/FT/2A/23
+    Date:  23 November 2024 
+-->
 <%@page import="java.util.*, java.sql.*"%>
 <%
 // Initialize variables
 Integer id = null;
 String category = "Unknown Category";
 String description = "Description not available.";
-String packagePrice = "0.00";
+String price_per_hour = "0.00";
 String service = "No service";
 int count = 0;
 List<String> services = new ArrayList<>();
 List<Integer> services_id = new ArrayList<>();
 Integer userRoleId = (Integer) session.getAttribute("userRoleId");
+
 try {
-	// Parse ID from request parameter
 	if (request.getParameter("id") != null && userRoleId != null) {
 		id = Integer.parseInt(request.getParameter("id"));
 
-		// Database connection details
+		// Step1: Load JDBC Driver
 		Class.forName("org.postgresql.Driver");
+
+		// Step 2: Define Connection URL
 		String connURL = "jdbc:postgresql://ep-late-flower-a15dwl0h.ap-southeast-1.aws.neon.tech/cleaningService?sslmode=require";
 		String dbUsername = "neondb_owner";
 		String dbPassword = "fbtpKBzO01Jl";
 
-		// Establish connection
+		// Step 3: Establish connection to URL
 		Connection conn = DriverManager.getConnection(connURL, dbUsername, dbPassword);
 
-		// Query database
-		String sqlStr = "SELECT category, description, package_price FROM service_category WHERE id = ?";
+		// Step 4: Create Statement object
+		Statement stmt = conn.createStatement();
+
+		// Step 5: Execute SQL Command
+		String sqlStr = "SELECT category, description, price_per_hour FROM service_category WHERE id = ?";
 		PreparedStatement pstmt = conn.prepareStatement(sqlStr);
 		pstmt.setInt(1, id);
 		ResultSet rs = pstmt.executeQuery();
 
-		// Process result
+		// Step 6: Process Result 
 		if (rs.next()) {
 	category = rs.getString("category");
 	description = rs.getString("description");
-	double price = rs.getDouble("package_price");
-	packagePrice = String.format("%.2f", price);
+	double price = rs.getDouble("price_per_hour");
+	price_per_hour = String.format("%.2f", price);
 		}
 
 		String sqlStr2 = "SELECT id, service_name FROM service WHERE category_id = ? ORDER BY id";
@@ -67,7 +78,7 @@ try {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Booking Service</title>
 <link href="assets/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="css/bookingService.css">
+<link rel="stylesheet" href="css/form.css">
 </head>
 <body>
 	<!-- Include header -->
@@ -83,15 +94,16 @@ try {
 						</div>
 						<div class="card-body">
 							<h1 class="card-title pricing-card-title">
-								$<%=packagePrice%><small class="text-muted fw-light">/hr</small>
+								$<%=price_per_hour%><small class="text-muted fw-light">/hr</small>
 							</h1>
 							<p><%=description%></p>
 						</div>
 					</div>
 				</div>
 
+				<!-- Form to book -->
 				<h2 class="display-6 text-center mb-4">Booking Appointment</h2>
-				<form action="bookingDetails.jsp" method="post">
+				<form action="bookingDetails.jsp" method="post" class="form">
 					<p>Choose your service</p>
 					<select name="serviceList" size="<%=count%>" required>
 						<%
@@ -106,12 +118,19 @@ try {
 					</select><br>
 					<p>Select your date for cleaning</p>
 					<input type="date" name="date" required>
-					<p>Choose your timing</p>
-					<input type="time" name="time" required>
+					<p>Start timing</p>
+					<input type="time" name="startTime" required>
+					<p>End timing</p>
+					<input type="time" name="endTime" required>
 					<button type="submit" class="btn">Add booking to cart</button>
 				</form>
 			</div>
 		</section>
 	</main>
+	<script
+		src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+	<script
+		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+
 </body>
 </html>

@@ -1,8 +1,16 @@
+<!--
+    Author: Tan Rui Zhang Jovan
+    Admin No: p2322951
+    Class: DIT/FT/2A/23
+    Date:  23 November 2024 
+-->
 <%@page import="java.sql.*"%>
 <%
+//Initalised variables
 int id = 0;
 String name = request.getParameter("username");
 String password = request.getParameter("password");
+int userRoleId;
 
 if (name != null && password != null) {
 	try {
@@ -29,8 +37,11 @@ if (name != null && password != null) {
 
 		// Step 6: Process Result
 		if (rs.next()) {
+	userRoleId = rs.getInt("user_role_id");
 	id = rs.getInt("id");
-	session.setAttribute("userRoleId", id);
+	session.setAttribute("userRoleId", userRoleId);
+	session.setAttribute("userId", id);
+	session.setAttribute("justLoggedIn", true);
 	response.sendRedirect("index.jsp");
 		} else {
 	session.setAttribute("loginError", "Invalid username or password. Please try again.");

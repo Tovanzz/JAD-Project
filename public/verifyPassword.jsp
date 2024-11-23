@@ -1,5 +1,13 @@
+<!--
+    Author: Tan Rui Zhang Jovan
+    Admin No: p2322951 
+    Class: DIT/FT/2A/23
+    Date:  23 November 2024 
+-->
+
 <%@page import="java.sql.*"%>
 <%
+//Initalised variables
 int id = 0;
 String oldPassword = request.getParameter("oldPassword");
 String newPassword = request.getParameter("newPassword");
@@ -62,7 +70,7 @@ if (oldPassword != null && email != null) {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="X-UA-Compatible" content="ie=edge">
-<title>Forgot Password</title>
+<title>Create New Password</title>
 <link rel="stylesheet" href="css/login.css">
 
 <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css'

@@ -1,5 +1,13 @@
+<!--
+    Author: Tan Rui Zhang Jovan
+    Admin No: p2322951
+    Class: DIT/FT/2A/23
+    Date:  23 November 2024 
+-->
+
 <%@page import="java.sql.*"%>
 <%
+//Initalised variables
 String email = request.getParameter("email");
 String confirmEmail;
 if (email != null) {
@@ -28,10 +36,8 @@ if (email != null) {
 		if (rs.next()) {
 	confirmEmail = rs.getString("email");
 	session.setAttribute("email", confirmEmail);
-out.println("Redirecting to verifyPassword.jsp"); // Debug log
 	response.sendRedirect("verifyPassword.jsp");
 		} else {
-			out.println("Email not found in database: " + email);
 	session.setAttribute("loginError", "Incorrect email. Try again");
 		}
 		conn.close();

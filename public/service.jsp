@@ -1,9 +1,16 @@
+<!--
+    Author: Tan Rui Zhang Jovan
+    Admin No: p2322951
+    Class: DIT/FT/2A/23
+    Date:  23 November 2024 
+-->
 <%@page import="java.util.*, java.sql.*"%>
 <%
+//Initalised variables
+Integer userRoleId = (Integer) session.getAttribute("userRoleId");
 String id = request.getParameter("id");
-String category;
-String description;
-String image_url;
+String category = "";
+String description = "";
 
 List<Map<String, String>> services = new ArrayList<>();
 
@@ -26,6 +33,18 @@ if (id != null) {
 		Statement stmt = conn.createStatement();
 
 		// Step 5: Execute SQL Command
+		String categoryQuery = "SELECT * FROM service_category WHERE id = ?";
+		PreparedStatement pstmtCategory = conn.prepareStatement(categoryQuery);
+		pstmtCategory.setInt(1, serviceCategoryId);
+		ResultSet rsCategory = pstmtCategory.executeQuery();
+
+		// Step 6: Process Result
+		if (rsCategory.next()) {
+	category = rsCategory.getString("category");
+	description = rsCategory.getString("description");
+		}
+
+		// Step 5: Execute SQL Command
 		String sqlStr = "SELECT * FROM service WHERE category_id = ? ORDER BY id";
 		PreparedStatement pstmt = conn.prepareStatement(sqlStr);
 		pstmt.setInt(1, serviceCategoryId);
@@ -34,6 +53,7 @@ if (id != null) {
 		// Step 6: Process Result
 		while (rs.next()) {
 	Map<String, String> service = new HashMap<>();
+	service.put("serviceId", rs.getString("id"));
 	service.put("service_name", rs.getString("service_name"));
 	service.put("description", rs.getString("description"));
 	service.put("image_url", rs.getString("image_url"));
@@ -56,7 +76,7 @@ if (id != null) {
 <meta name="author"
 	content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
 <meta name="generator" content="Hugo 0.84.0">
-<title>Album example Â· Bootstrap v5.0</title>
+<title>Service Page</title>
 
 <!-- Bootstrap core CSS -->
 <link href="assets/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -86,19 +106,23 @@ if (id != null) {
 		<section class="py-5 text-center container">
 			<div class="row py-lg-5">
 				<div class="col-lg-6 col-md-8 mx-auto">
-					<h1 class="fw-light">Album example</h1>
-					<p class="lead text-muted">Something short and leading about
-						the collection below—its contents, the creator, etc. Make it short
-						and sweet, but not too short so folks don’t simply skip over it
-						entirely.</p>
-					<p>
-						<a href="#" class="btn btn-primary my-2">Main call to action</a> <a
-							href="#" class="btn btn-secondary my-2">Secondary action</a>
-					</p>
+					<h1 class="fw-light"><%=category%></h1>
+					<%
+					if (userRoleId != null && userRoleId == 1) {
+					%>
+					<form action="createService.jsp" method="get">
+						<button type="submit" class="btn btn-sm btn-primary">Create
+							services</button>
+					</form>
+					<%
+					}
+					%>
+					<p class="lead text-muted"><%=description%></p>
 				</div>
 			</div>
 		</section>
 
+		<!-- Displaying of different services -->
 		<div class="album py-5 bg-light">
 			<div class="container">
 				<div class="row row-cols-1 row-cols-md-3 g-4">
@@ -109,19 +133,27 @@ if (id != null) {
 						<div class="card shadow-sm h-100">
 							<!-- Replace the SVG placeholder with an actual image -->
 							<img src="<%=service.get("image_url")%>" class="card-img-top"
-								alt="<%=service.get("category")%>" height="225" />
-
+								height="225" />
 							<div class="card-body">
 								<h2 class="text-center"><%=service.get("service_name")%></h2>
 								<p class="card-text"><%=service.get("description")%></p>
 								<div class="d-flex justify-content-between align-items-center">
 									<div class="btn-group">
-										<button type="button" class="btn btn-sm btn-outline-secondary">View</button>
+										<form action="booking.jsp" method="get">
+											<button type="submit" class="btn btn-sm btn-primary">Book
+												Now</button>
+										</form>
 										<%
-										Integer userRoleId = (Integer) session.getAttribute("userRoleId");
 										if (userRoleId != null && userRoleId == 1) {
 										%>
-										<button type="button" class="btn btn-sm btn-outline-secondary">Edit</button>
+										<form action="editService.jsp" method="post">
+											<button type="submit" class="btn btn-sm btn-warning"
+												name="id" value=<%=service.get("serviceId")%>>Edit</button>
+										</form>
+										<form action="deleteService.jsp" method="post">
+											<button type="submit" class="btn btn-sm btn-danger" name="id"
+												value=<%=service.get("serviceId")%>>Delete</button>
+										</form>
 										<%
 										}
 										%>
@@ -139,7 +171,7 @@ if (id != null) {
 	</main>
 
 	<!-- Include the footer -->
-	<jsp:include page="footer.html" />
+	<jsp:include page="footer.jsp" />
 
 	<script src="assets/dist/js/bootstrap.bundle.min.js"></script>
 </body>

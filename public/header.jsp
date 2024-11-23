@@ -1,4 +1,17 @@
+<!--
+    Author:GERALD SIM KANG LE
+    Admin No: p2209319
+    Class: DIT/FT/2A/23
+    Date:  23 November 2024 
+-->
+<%
+//Initalised variables
+Integer userRoleId = (Integer) session.getAttribute("userRoleId");
+Integer noOfBooking = (Integer) session.getAttribute("noOfBooking");
+%>
+
 <header>
+	<!-- Collapsible Navbar -->
 	<div class="collapse bg-dark" id="navbarHeader">
 		<div class="container">
 			<div class="row">
@@ -18,32 +31,51 @@
 							<li><a class="dropdown-item" href="#">Provide Feedback</a></li>
 							<li><hr class="dropdown-divider" /></li>
 							<li class="dropdown-header">Cleaning Services</li>
-							<li><a class="dropdown-item" href="#">Home Cleaning</a></li>
-							<li><a class="dropdown-item" href="#">Office Cleaning</a></li>
-							<li><a class="dropdown-item" href="#">Carpet &
+							<li><a class="dropdown-item" href="service.jsp?id=1">Home Cleaning</a></li>
+							<li><a class="dropdown-item" href="service.jsp?id=2">Office Cleaning</a></li>
+							<li><a class="dropdown-item" href="service.jsp?id=3">Carpet &
 									Upholstery Cleaning</a></li>
 						</ul>
 					</div>
 				</div>
-				<%
-				Integer userRoleId = (Integer) session.getAttribute("userRoleId");
-				if (userRoleId == null) {
-				%>
+
 				<div class="col-md-4 text-end py-4">
+					<%
+					if (userRoleId != null) {
+					%>
+					<!-- Display Profile and Logout for logged-in users -->
+					<a href="userProfile.jsp"
+						class="text-white text-decoration-none me-3" title="Edit Profile">
+						<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"
+							fill="currentColor" class="bi bi-person-circle text-white me-3"
+							viewBox="0 0 16 16">
+                            <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0" />
+                            <path fill-rule="evenodd"
+								d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1" />
+                        </svg>
+					</a>
+					<form action="logout.jsp" method="post" class="d-inline-block">
+						<button class="btn btn-danger" type="submit">Logout</button>
+					</form>
+					<%
+					} else {
+					%>
+					<!-- Display Login/Sign-Up buttons for guests -->
 					<form action="login.jsp" class="d-inline-block">
 						<button class="btn btn-info me-2" type="submit">Login</button>
 					</form>
-					<form action="registerMember.html" class="d-inline-block">
+					<form action="registerMember.jsp" class="d-inline-block">
 						<button class="btn btn-primary" type="submit">Sign Up</button>
 					</form>
+					<%
+					}
+					%>
 				</div>
-				<%
-				}
-				%>
 			</div>
 		</div>
 	</div>
 
+	<!-- Navbar -->
 	<div class="navbar navbar-dark bg-dark shadow-sm">
 		<div class="container">
 			<a href="/" class="navbar-brand d-flex align-items-center"> <svg
@@ -55,10 +87,14 @@
 						d="M1.333 6.334v3C1.333 10.805 4.318 12 8 12s6.667-1.194 6.667-2.667V6.334a6.5 6.5 0 0 1-1.458.79C11.81 7.684 9.967 8 8 8s-3.809-.317-5.208-.876a6.5 6.5 0 0 1-1.458-.79z" />
                     <path
 						d="M14.667 11.668a6.5 6.5 0 0 1-1.458.789c-1.4.56-3.242.876-5.21.876-1.966 0-3.809-.316-5.208-.876a6.5 6.5 0 0 1-1.458-.79v1.666C1.333 14.806 4.318 16 8 16s6.667-1.194 6.667-2.667z" />
-                </svg> <strong>Cleaning Services</strong>
+                </svg> <strong>Dust Be Gone</strong>
 			</a>
 
 			<div class="d-flex align-items-center">
+				<%
+				// Only show the cart SVG for members and admin (userRoleId == 1 || userRoleId == 2)
+				if (userRoleId != null && (userRoleId == 2 || userRoleId == 1)) {
+				%>
 				<a href="cart.jsp"
 					class="text-decoration-none text-white position-relative me-3">
 					<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25"
@@ -66,9 +102,11 @@
                         <path
 							d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5M5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4m7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4m-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2" />
                     </svg> <span id="cart-badge"
-					class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-						0 </span>
+					class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"><%=noOfBooking%></span>
 				</a>
+				<%
+				}
+				%>
 
 				<!-- Navbar Toggler -->
 				<button class="navbar-toggler" type="button"

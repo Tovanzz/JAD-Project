@@ -27,7 +27,7 @@ try {
 	Statement stmt = conn.createStatement();
 
 	// Step 5: Execute SQL Command
-	String sqlStr = "SELECT " + "s.service_name, " + "b.date_for_service, " + "b.start_time_for_service, "
+	String sqlStr = "SELECT " + "b.id," + "s.service_name, " + "b.date_for_service, " + "b.start_time_for_service, "
 	+ "b.end_time_for_service, " + "sc.price_per_hour, "
 	+ "(EXTRACT(EPOCH FROM (b.end_time_for_service - b.start_time_for_service)) / 3600) * sc.price_per_hour AS total_price "
 	+ "FROM booking b " + "JOIN service s ON b.service_id = s.id "
@@ -39,6 +39,7 @@ try {
 	// Step 6: Process Result
 	while (rs.next()) {
 		Map<String, String> booking = new HashMap<>();
+		booking.put("cart_id", rs.getString("id"));
 		booking.put("service_name", rs.getString("service_name"));
 		booking.put("date_for_service", rs.getString("date_for_service"));
 		booking.put("start_time_for_service", rs.getString("start_time_for_service"));
@@ -85,6 +86,7 @@ try {
 					<th>Start Time</th>
 					<th>End Time</th>
 					<th>Price</th>
+					<th>Action</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -99,7 +101,11 @@ try {
 					<%
 					Double price = Double.parseDouble(booking.get("total_price"));
 					%>
-					<td><%= String.format("%.2f", price) %></td>
+					<td><%=String.format("%.2f", price)%></td>
+					<td><form action="deleteCart.jsp" method="get">
+							<button type="submit" class="btn btn-sm btn-danger" name="bookingId"
+								value=<%=booking.get("cart_id")%>>Cancel Booking</button>
+						</form></td>
 				</tr>
 				<%
 				}

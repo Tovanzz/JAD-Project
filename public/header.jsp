@@ -8,6 +8,9 @@
 //Initalised variables
 Integer userRoleId = (Integer) session.getAttribute("userRoleId");
 Integer noOfBooking = (Integer) session.getAttribute("noOfBooking");
+if (noOfBooking == null) {
+	noOfBooking = 0;
+}
 %>
 
 <header>

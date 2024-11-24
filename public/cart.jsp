@@ -101,7 +101,7 @@ try {
 					<%
 					Double price = Double.parseDouble(booking.get("total_price"));
 					%>
-					<td><%=String.format("%.2f", price)%></td>
+					<td>$<%=String.format("%.2f", price)%></td>
 					<td><form action="deleteCart.jsp" method="get">
 							<button type="submit" class="btn btn-sm btn-danger" name="bookingId"
 								value=<%=booking.get("cart_id")%>>Cancel Booking</button>

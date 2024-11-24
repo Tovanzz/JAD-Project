@@ -1,36 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="X-UA-Compatible" content="ie=edge">
-<title>Login</title>
+<title>Register Membership</title>
 <link rel="stylesheet" href="css/login.css">
 <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css'
 	rel='stylesheet'>
 <style>
-/* Styles for the back button */
-.back-btn {
+/* Styles for the back arrow */
+a {
 	position: fixed; 
 	top: 20px; 
 	left: 20px; 
 	z-index: 1000; 
-	background: none; 
-	border: none;
-	padding: 0; 
-	cursor: pointer; 
 }
 
-.back-btn svg {
-	width: 48px;
+svg {
+	width: 48px; 
 	height: 48px; 
 	fill: beige; 
 }
 </style>
 </head>
+
 <body>
-	<!-- Back button with SVG -->
-	<a href="index.jsp" class="back-btn"
+	<a href="javascript:void(0);" onclick="history.back();"
 		style="color: #fff; text-decoration: none;"> <svg
 			xmlns="http://www.w3.org/2000/svg" width="24" height="24"
 			fill="currentColor" class="bi bi-arrow-left-circle-fill"
@@ -41,41 +38,25 @@
 	</a>
 
 	<div class="wrapper">
-		<form action="/JAD-CA1/LoginServlet" method="post">
-			<h1>Login</h1>
+		<form action="/JAD-CA1/RegisterMembershipServlet" method="post">
+			<h1>Register Membership</h1>
 			<div class="input-box">
-				<input type="text" placeholder="Username" name="username" required>
+				<input type="text" placeholder="Username" name="name" required>
 				<i class='bx bxs-user'></i>
 			</div>
+
+			<div class="input-box">
+				<input type="email" placeholder="Email" name="email" required>
+				<i class='bx bxs-envelope'></i>
+			</div>
+
 			<div class="input-box">
 				<input type="password" placeholder="Password" name="password"
 					required> <i class='bx bxs-lock-alt'></i>
 			</div>
-			<div class="remember-forgot">
-				<label><input type="checkbox"> Remember me</label> <a
-					href="forgotPassword.jsp">Forgot password?</a>
-			</div>
-			<%
-			String loginError = (String) session.getAttribute("loginError");
-			%>
-			<%
-			if (loginError != null) {
-			%>
-			<p
-				style="color: white; text-align: center; border: 3px solid #EE6B6E; border-radius: 20px; background-color: #EE6B6E;">
-				<%=loginError%>
-			</p>
-			<%
-			session.removeAttribute("loginError");
-			}
-			%>
-			<button type="submit" class="btn" style="margin-top: 20px;">Login</button>
-			<div class="register-link">
-				<p>
-					Don't have an account? <a href="registerMember.jsp">Register</a>
-				</p>
-			</div>
+			<button type="submit" class="btn" style="margin-top: 20px;">Register</button>
 		</form>
 	</div>
 </body>
+
 </html>
